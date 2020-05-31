@@ -9,3 +9,17 @@ class Room(models.Model):
     e_to = models.IntegerField(default=0)
     w_to = models.IntegerField(default=0)
     #TODO implement x,y int fields?
+
+class Player(models.Model):
+    currentRoom = models.IntegerField(default=0)
+    uuid = models.UUIDField(default=uuid.uuid4, unique=True)
+    def initialize(self):
+        if self.currentRoom == 0:
+            self.currentRoom = Room.objects.first().id
+            self.save()
+    def room(self):
+        try:
+            return Room.objects.get(id=self.currentRoom)
+        except Room.DoesNotExist:
+            self.initialize()
+            return self.room()
